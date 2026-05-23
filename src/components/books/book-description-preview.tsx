@@ -22,10 +22,19 @@ export function BookDescriptionPreview({ description, title }: BookDescriptionPr
     <>
       <button
         type="button"
-        className="text-muted-foreground hover:text-foreground max-w-3xl text-left text-sm leading-7 transition-colors"
+        className="text-muted-foreground hover:text-foreground block max-h-14 w-full max-w-3xl min-w-0 overflow-hidden text-left text-sm leading-7 transition-colors"
         onClick={() => setOpen(true)}
       >
-        <span className="line-clamp-2">{description}</span>
+        <span
+          className="block overflow-hidden"
+          style={{
+            display: '-webkit-box',
+            WebkitBoxOrient: 'vertical',
+            WebkitLineClamp: 2,
+          }}
+        >
+          {description}
+        </span>
       </button>
 
       <Drawer open={open} onOpenChange={setOpen}>
