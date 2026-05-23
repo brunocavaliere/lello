@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-import { Image as ImageIcon, Mic, NotebookPen, Plus } from 'lucide-react';
+import { Mic, NotebookPen, Plus } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +13,6 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from '@/components/ui/drawer';
-import { showInfoToast } from '@/lib/toast';
 
 const NOTE_ACTIONS = [
   {
@@ -27,12 +26,6 @@ const NOTE_ACTIONS = [
     label: 'Áudio',
     description: 'Dite uma nota rapidamente.',
     icon: Mic,
-  },
-  {
-    key: 'image',
-    label: 'Imagem',
-    description: 'Guarde uma foto de página, trecho ou anotação.',
-    icon: ImageIcon,
   },
 ] as const;
 
@@ -59,7 +52,7 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
       </DrawerTrigger>
 
       <DrawerContent className="h-[50dvh] max-h-[50dvh] px-0 pb-[calc(env(safe-area-inset-bottom)+1rem)]">
-        <DrawerHeader className="gap-3 px-5 pt-6 pb-4 sm:px-6">
+        <DrawerHeader className="mb-10 gap-1 px-5 sm:px-6">
           <DrawerTitle className="font-editorial text-2xl tracking-[-0.03em]">
             Nova nota
           </DrawerTitle>
@@ -68,7 +61,7 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
           </DrawerDescription>
         </DrawerHeader>
 
-        <div className="flex-1 space-y-2 px-3 sm:px-4">
+        <div className="flex-1 space-y-4 px-3 sm:px-4">
           {NOTE_ACTIONS.map((action) => {
             const Icon = action.icon;
 
@@ -76,7 +69,7 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
               <Button
                 key={action.label}
                 type="button"
-                variant="ghost"
+                variant="outline"
                 className="h-auto w-full justify-start rounded-[1.35rem] px-4 py-4 text-left"
                 onClick={() => {
                   if (action.key === 'text') {
@@ -90,11 +83,6 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
                     onSelectAudioNote();
                     return;
                   }
-
-                  setIsOpen(false);
-                  showInfoToast(action.label, {
-                    description: 'Fluxo de criação chega no próximo passo.',
-                  });
                 }}
               >
                 <div className="flex items-start gap-4">
@@ -102,7 +90,7 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
                     <Icon className="size-4" />
                   </div>
 
-                  <div className="min-w-0 flex-1 space-y-1">
+                  <div className="min-w-0 flex-1">
                     <p className="truncate">{action.label}</p>
                     <p className="text-muted-foreground text-sm leading-6 break-words whitespace-normal">
                       {action.description}
