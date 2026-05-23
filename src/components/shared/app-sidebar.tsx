@@ -1,13 +1,15 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
 import type { ComponentType } from 'react';
 
-import { ArrowUpRight, BookOpenText, LayoutDashboard, Settings2 } from 'lucide-react';
+import { BookMarked, ListTodo } from 'lucide-react';
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { env } from '@/env';
 import { cn } from '@/lib/utils';
 
 type AppSidebarItem = {
@@ -23,41 +25,35 @@ type AppSidebarProps = {
 
 const DEFAULT_ITEMS: AppSidebarItem[] = [
   {
-    label: 'Dashboard',
-    href: '#dashboard',
-    icon: LayoutDashboard,
-    isActive: true,
+    label: 'Biblioteca',
+    href: '/library',
+    icon: BookMarked,
   },
   {
-    label: 'Patterns',
-    href: '#patterns',
-    icon: BookOpenText,
-  },
-  {
-    label: 'Settings',
-    href: '#settings',
-    icon: Settings2,
+    label: 'Fila de leitura',
+    href: '/reading-queue',
+    icon: ListTodo,
   },
 ];
 
 export function AppSidebar({ items = DEFAULT_ITEMS }: AppSidebarProps) {
+  const pathname = usePathname();
+
   return (
-    <div className="flex h-full min-h-0 flex-col">
-      <div className="flex items-center gap-3 px-5 py-5">
-        <Avatar size="lg" className="from-foreground/95 to-foreground/70 bg-linear-to-br">
+    <div className="flex h-full min-h-0 flex-col bg-transparent">
+      <div className="flex items-center gap-3 px-5 py-6">
+        <Avatar size="lg" className="bg-foreground text-background rounded-2xl">
           <AvatarFallback className="text-background bg-transparent font-semibold">
-            {env.NEXT_PUBLIC_APP_NAME.slice(0, 2).toUpperCase()}
+            LE
           </AvatarFallback>
         </Avatar>
 
         <div className="min-w-0">
-          <p className="truncate text-sm font-semibold">{env.NEXT_PUBLIC_APP_NAME}</p>
-          <p className="text-muted-foreground text-xs">Starter para produtos SaaS</p>
+          <Link href="/" className="truncate text-sm font-semibold tracking-tight">
+            Lello
+          </Link>
+          <p className="text-muted-foreground text-xs">memoria de leitura</p>
         </div>
-
-        <Badge variant="outline" className="ml-auto rounded-full">
-          Beta
-        </Badge>
       </div>
 
       <Separator />
@@ -66,46 +62,32 @@ export function AppSidebar({ items = DEFAULT_ITEMS }: AppSidebarProps) {
         <ul className="space-y-1.5">
           {items.map((item) => {
             const Icon = item.icon;
+            const isActive =
+              item.isActive ??
+              (item.href === '/'
+                ? pathname === '/'
+                : pathname === item.href || pathname.startsWith(`${item.href}/`));
 
             return (
               <li key={item.label}>
                 <Button
                   asChild
-                  variant={item.isActive ? 'secondary' : 'ghost'}
+                  variant={isActive ? 'secondary' : 'ghost'}
                   className={cn(
-                    'h-auto w-full justify-start gap-3 rounded-2xl px-3 py-2.5 text-sm',
-                    item.isActive && 'shadow-xs'
+                    'h-auto w-full justify-start gap-3 rounded-2xl px-3 py-2.5 text-sm shadow-none',
+                    isActive && 'bg-secondary/80 text-foreground'
                   )}
                 >
-                  <a href={item.href}>
+                  <Link href={item.href}>
                     {Icon ? <Icon className="size-4" /> : null}
                     <span>{item.label}</span>
-                  </a>
+                  </Link>
                 </Button>
               </li>
             );
           })}
         </ul>
       </nav>
-
-      <Separator />
-
-      <div className="px-4 py-4">
-        <Card className="bg-muted/40 border-border/70 rounded-2xl py-0 shadow-none">
-          <CardContent className="p-0">
-            <a
-              href={env.NEXT_PUBLIC_APP_URL}
-              className="hover:bg-accent flex items-center justify-between rounded-2xl px-4 py-3 text-sm transition-colors"
-            >
-              <div>
-                <p className="font-medium">Base pronta para evoluir</p>
-                <p className="text-muted-foreground text-xs">Shell, modulos e providers prontos</p>
-              </div>
-              <ArrowUpRight className="text-muted-foreground size-4" />
-            </a>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

@@ -1,33 +1,18 @@
-import {
-  AppHeader,
-  AppShell,
-  AppSidebar,
-  LoadingState,
-  PageContainer,
-  PageHeader,
-} from '@/components/shared';
+import { AppShell, LoadingState, PageContainer } from '@/components/shared';
 
 export default function Loading() {
   return (
-    <AppShell sidebar={<AppSidebar />} header={<AppHeader />}>
-      <PageContainer>
-        <PageHeader
-          title="Carregando workspace"
-          description="Preparando a aplicacao, os modulos e os dados principais da tela."
+    <AppShell
+      header={
+        <span className="font-editorial text-2xl font-semibold tracking-[-0.04em]">Lello</span>
+      }
+    >
+      <PageContainer className="mx-auto w-full max-w-6xl">
+        <LoadingState
+          title="Abrindo biblioteca"
+          description="Carregando livros e notas."
+          lines={4}
         />
-
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
-          <LoadingState
-            title="Montando dashboard"
-            description="Carregando indicadores, areas principais e composicao da interface."
-            lines={4}
-          />
-          <LoadingState
-            title="Sincronizando painel lateral"
-            description="Atualizando contexto visual e dados secundarios desta experiencia."
-            lines={3}
-          />
-        </section>
       </PageContainer>
     </AppShell>
   );

@@ -12,12 +12,14 @@ type PageHeaderProps = {
 
 export function PageHeader({ actions, className, description, title }: PageHeaderProps) {
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn('space-y-7', className)}>
       <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div className="space-y-2">
-          <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">{title}</h1>
+          <h1 className="font-serif text-3xl leading-none font-semibold tracking-[-0.03em] sm:text-4xl">
+            {title}
+          </h1>
           {description ? (
-            <p className="text-muted-foreground max-w-3xl text-sm leading-6 sm:text-base">
+            <p className="text-muted-foreground max-w-3xl text-sm leading-7 sm:text-base">
               {description}
             </p>
           ) : null}
