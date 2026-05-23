@@ -30,6 +30,7 @@ export function BooksList({
         title={emptyTitle}
         description={emptyDescription}
         icon={<BookOpenText className="size-5" />}
+        className="h-full max-h-[600px] min-h-[320px]"
       />
     );
   }

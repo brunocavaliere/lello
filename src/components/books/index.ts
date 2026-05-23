@@ -1,4 +1,5 @@
 export { BookHeader } from '@/components/books/book-header';
+export { BookCover } from '@/components/books/book-cover';
 export { BookHighlights } from '@/components/books/book-highlights';
 export { BookCard } from '@/components/books/book-card';
 export { BookDetailWorkspace } from '@/components/books/book-detail-workspace';
@@ -21,7 +22,10 @@ export {
   useBooks,
   useCreateBook,
   useCurrentBook,
+  useDeleteBook,
+  useExternalBookSearch,
   useRecentReflections,
+  useUpdateBook,
 } from '@/components/books/hooks';
 export {
   getBookById,
@@ -33,11 +37,13 @@ export {
   getCurrentBook,
   getQueueBooks,
   getRecentReflectionEntries,
+  searchExternalBooks,
   updateBook,
 } from '@/components/books/services';
 export type {
   Book,
   BookContext,
+  ExternalBook,
   BookHighlight,
   BookNote,
   BookNoteType,

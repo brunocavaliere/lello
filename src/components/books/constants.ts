@@ -6,11 +6,11 @@ export const BOOK_STATUS_META: Record<Book['status'], BookStatusMeta> = {
     badgeVariant: 'outline',
   },
   reading: {
-    label: 'Lendo',
+    label: 'Estou lendo',
     badgeVariant: 'secondary',
   },
   completed: {
-    label: 'Lido',
+    label: 'Já lido',
     badgeVariant: 'default',
   },
 };
@@ -18,6 +18,7 @@ export const BOOK_STATUS_META: Record<Book['status'], BookStatusMeta> = {
 export const MOCK_BOOKS: Book[] = [
   {
     id: 'deep-work',
+    user_id: 'mock-user',
     title: 'Deep Work',
     author: 'Cal Newport',
     status: 'reading',
@@ -26,6 +27,7 @@ export const MOCK_BOOKS: Book[] = [
   },
   {
     id: 'make-it-stick',
+    user_id: 'mock-user',
     title: 'Make It Stick',
     author: 'Peter C. Brown',
     status: 'reading',
@@ -34,6 +36,7 @@ export const MOCK_BOOKS: Book[] = [
   },
   {
     id: 'atomic-habits',
+    user_id: 'mock-user',
     title: 'Atomic Habits',
     author: 'James Clear',
     status: 'completed',
@@ -43,6 +46,7 @@ export const MOCK_BOOKS: Book[] = [
   },
   {
     id: 'thinking-fast-and-slow',
+    user_id: 'mock-user',
     title: 'Thinking, Fast and Slow',
     author: 'Daniel Kahneman',
     status: 'completed',
@@ -52,6 +56,7 @@ export const MOCK_BOOKS: Book[] = [
   },
   {
     id: 'how-to-take-smart-notes',
+    user_id: 'mock-user',
     title: 'How to Take Smart Notes',
     author: 'Sönke Ahrens',
     status: 'want_to_read',
@@ -60,6 +65,7 @@ export const MOCK_BOOKS: Book[] = [
   },
   {
     id: 'a-swim-in-a-pond-in-the-rain',
+    user_id: 'mock-user',
     title: 'A Swim in a Pond in the Rain',
     author: 'George Saunders',
     status: 'want_to_read',
@@ -90,11 +96,11 @@ export const BOOK_STATUS_OPTIONS = [
     value: 'want_to_read',
   },
   {
-    label: 'Lendo',
+    label: 'Estou lendo',
     value: 'reading',
   },
   {
-    label: 'Lido',
+    label: 'Já li',
     value: 'completed',
   },
 ] as const;

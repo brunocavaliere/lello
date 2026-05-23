@@ -1,9 +1,10 @@
+import { BookCover } from '@/components/books/book-cover';
 import Link from 'next/link';
 
-import { ArrowUpRight, Star } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 
 import type { Book } from '@/components/books/types';
-import { formatBookDate, formatBookRating, getBookStatusMeta } from '@/components/books/utils';
+import { formatBookDate, formatBookDateCompact, getBookStatusMeta } from '@/components/books/utils';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -25,13 +26,22 @@ export function BookCard({ book, variant = 'default' }: BookCardProps) {
         isCompact && 'rounded-lg'
       )}
     >
-      <div className={cn('flex items-start justify-between gap-4', isCompact && 'gap-3')}>
-        <div className="min-w-0 space-y-3">
-          <div className="flex flex-wrap items-center gap-2">
+      <div className={cn('flex items-start gap-4', isCompact && 'gap-3')}>
+        <BookCover
+          alt={`Capa de ${book.title}`}
+          coverUrl={book.cover_url}
+          className={cn('h-24 w-16 shrink-0', isCompact && 'h-20 w-14')}
+        />
+
+        <div className="min-w-0 flex-1">
+          <div className="mb-2 flex flex-wrap items-center gap-2">
             <Badge variant={statusMeta.badgeVariant} className="rounded-full">
               {statusMeta.label}
             </Badge>
-            <span className="text-muted-foreground text-xs">
+            <span className="text-muted-foreground text-xs sm:hidden">
+              {formatBookDateCompact(book.created_at)}
+            </span>
+            <span className="text-muted-foreground hidden text-xs sm:inline">
               Adicionado em {formatBookDate(book.created_at)}
             </span>
           </div>
@@ -47,22 +57,10 @@ export function BookCard({ book, variant = 'default' }: BookCardProps) {
             </h3>
             <p className="text-muted-foreground text-sm">{book.author}</p>
           </div>
-
-          <div className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span>{statusMeta.label}</span>
-            {book.status === 'completed' ? (
-              <span className="inline-flex items-center gap-1.5">
-                <Star className="size-3.5" />
-                {formatBookRating(book.rating ?? undefined)}
-              </span>
-            ) : null}
-          </div>
         </div>
 
         <ArrowUpRight className="text-muted-foreground mt-1 size-4 shrink-0" />
       </div>
-
-      <p className="text-muted-foreground mt-4 text-xs">Abrir livro para escrever nova nota.</p>
     </Link>
   );
 }

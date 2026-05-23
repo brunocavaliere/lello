@@ -11,6 +11,7 @@ import type {
 import { BOOK_CONTEXT_BY_ID, MOCK_BOOKS } from '@/components/books/constants';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { requireAuthenticatedUser } from '@/lib/supabase/ensure-authenticated';
 import type { Database } from '@/lib/supabase/types';
 
 type BooksClient = SupabaseClient<Database>;
@@ -55,7 +56,12 @@ export async function getBooks(options?: GetBooksOptions, client?: BooksClient) 
   }
 
   const supabase = getBooksClient(client);
-  let query = supabase.from('books').select('*').order('updated_at', { ascending: false });
+  const user = await requireAuthenticatedUser(supabase);
+  let query = supabase
+    .from('books')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false });
 
   if (options?.status) {
     query = query.eq('status', options.status);
@@ -84,7 +90,13 @@ export async function getBookById(id: string, client?: BooksClient) {
   }
 
   const supabase = getBooksClient(client);
-  const { data, error } = await supabase.from('books').select('*').eq('id', id).maybeSingle();
+  const user = await requireAuthenticatedUser(supabase);
+  const { data, error } = await supabase
+    .from('books')
+    .select('*')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .maybeSingle();
 
   if (error) {
     throw new Error(`Nao foi possivel carregar o livro: ${error.message}`);
@@ -97,12 +109,18 @@ export async function createBook(input: BookInsert, client?: BooksClient) {
   ensureSupabaseConfigured();
 
   const supabase = getBooksClient(client);
+  const user = await requireAuthenticatedUser(supabase);
   const { data, error } = await supabase
     .from('books')
     .insert({
       author: input.author,
+      cover_url: input.cover_url,
+      description: input.description,
+      published_at: input.published_at,
+      publisher: input.publisher,
       status: input.status,
       title: input.title,
+      user_id: user.id,
     })
     .select('*')
     .single();
@@ -118,6 +136,7 @@ export async function updateBook(id: string, input: BookUpdate, client?: BooksCl
   ensureSupabaseConfigured();
 
   const supabase = getBooksClient(client);
+  const user = await requireAuthenticatedUser(supabase);
   const { data, error } = await supabase
     .from('books')
     .update({
@@ -125,6 +144,7 @@ export async function updateBook(id: string, input: BookUpdate, client?: BooksCl
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
+    .eq('user_id', user.id)
     .select('*')
     .single();
 
@@ -139,7 +159,8 @@ export async function deleteBook(id: string, client?: BooksClient) {
   ensureSupabaseConfigured();
 
   const supabase = getBooksClient(client);
-  const { error } = await supabase.from('books').delete().eq('id', id);
+  const user = await requireAuthenticatedUser(supabase);
+  const { error } = await supabase.from('books').delete().eq('id', id).eq('user_id', user.id);
 
   if (error) {
     throw new Error(`Nao foi possivel remover o livro: ${error.message}`);

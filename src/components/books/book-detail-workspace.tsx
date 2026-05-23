@@ -1,13 +1,15 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useDeferredValue, useMemo, useState } from 'react';
 
-import { BookOpen, Search } from 'lucide-react';
+import { BookOpen, MoreHorizontal, Search } from 'lucide-react';
 
+import { AddBookSheet } from '@/components/books/add-book-sheet';
 import { BookHeader } from '@/components/books/book-header';
 import { BookNoteComposer } from '@/components/books/book-note-composer';
-import { useBook } from '@/components/books/hooks';
+import { useBook, useDeleteBook } from '@/components/books/hooks';
 import { getBookContext } from '@/components/books/services';
 import {
   AudioNoteRecorderDrawer,
@@ -23,6 +25,12 @@ import type { Note, NoteCategory } from '@/components/notes';
 import { EmptyState, LoadingState, PageContainer } from '@/components/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { showErrorToast, showSuccessToast } from '@/lib/toast';
 
@@ -41,10 +49,13 @@ const NOTE_CATEGORY_FILTERS: Array<{ label: string; value: CategoryFilter }> = [
 ];
 
 export function BookDetailWorkspace({ bookId }: BookDetailWorkspaceProps) {
+  const router = useRouter();
   const query = useBook(bookId);
+  const deleteBook = useDeleteBook(bookId);
   const notesQuery = useBookNotes(bookId);
   const deleteNote = useDeleteNote(bookId);
   const context = getBookContext(bookId);
+  const [isBookEditorOpen, setIsBookEditorOpen] = useState(false);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isAudioRecorderOpen, setIsAudioRecorderOpen] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
@@ -106,6 +117,26 @@ export function BookDetailWorkspace({ bookId }: BookDetailWorkspaceProps) {
     }
   }
 
+  async function handleDeleteBook() {
+    const confirmed = window.confirm('Excluir livro?');
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteBook.mutateAsync();
+      showSuccessToast('Livro excluido.');
+      router.replace('/');
+      router.refresh();
+    } catch (error) {
+      showErrorToast('Nao foi possivel excluir o livro.', {
+        description:
+          error instanceof Error ? error.message : 'Tente novamente em alguns instantes.',
+      });
+    }
+  }
+
   if (query.isPending) {
     return (
       <PageContainer>
@@ -137,7 +168,28 @@ export function BookDetailWorkspace({ bookId }: BookDetailWorkspaceProps) {
 
   return (
     <PageContainer className="mx-auto w-full max-w-3xl gap-5">
-      <BookHeader book={query.data} context={context} />
+      <BookHeader
+        book={query.data}
+        context={context}
+        actions={
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" variant="ghost" size="icon-sm" className="shrink-0">
+                <MoreHorizontal className="size-4" />
+                <span className="sr-only">Ações do livro</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setIsBookEditorOpen(true)}>
+                Editar livro
+              </DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onClick={() => void handleDeleteBook()}>
+                Excluir livro
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        }
+      />
 
       <section className="space-y-4 pb-24">
         <div className="space-y-3">
@@ -210,6 +262,12 @@ export function BookDetailWorkspace({ bookId }: BookDetailWorkspaceProps) {
         bookId={bookId}
         open={isAudioRecorderOpen}
         onOpenChange={setIsAudioRecorderOpen}
+      />
+      <AddBookSheet
+        key={`${query.data.id}-${isBookEditorOpen ? 'open' : 'closed'}`}
+        book={query.data}
+        open={isBookEditorOpen}
+        onOpenChange={setIsBookEditorOpen}
       />
       <NoteEditorDrawer
         key={`${selectedNote?.id ?? 'new'}:${isEditorOpen ? 'open' : 'closed'}`}

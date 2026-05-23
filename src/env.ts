@@ -1,6 +1,18 @@
 import { z } from 'zod';
 
-export const serverEnvSchema = z.object({});
+const optionalServerEnvString = z.preprocess((value) => {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const trimmedValue = value.trim();
+
+  return trimmedValue.length > 0 ? trimmedValue : undefined;
+}, z.string().min(1).optional());
+
+export const serverEnvSchema = z.object({
+  GOOGLE_BOOKS_API_KEY: optionalServerEnvString,
+});
 
 const optionalClientEnvString = z.preprocess((value) => {
   if (typeof value !== 'string') {
@@ -86,7 +98,9 @@ const clientRuntimeEnv = {
   NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
 };
 
-const serverRuntimeEnv = {};
+const serverRuntimeEnv = {
+  GOOGLE_BOOKS_API_KEY: process.env.GOOGLE_BOOKS_API_KEY,
+};
 
 const clientEnv = parseEnv('client', clientEnvSchema, clientRuntimeEnv);
 const serverEnv =

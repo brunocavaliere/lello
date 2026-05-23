@@ -10,7 +10,6 @@ import { BooksList } from '@/components/books/books-list';
 import { useBooks } from '@/components/books/hooks';
 import type { Book } from '@/components/books/types';
 import { EmptyState, LoadingState, PageContainer } from '@/components/shared';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   Drawer,
@@ -35,9 +34,9 @@ type StatusFilter = 'all' | Book['status'];
 
 const STATUS_FILTERS: Array<{ label: string; value: StatusFilter }> = [
   { label: 'Todos', value: 'all' },
-  { label: 'Lendo', value: 'reading' },
+  { label: 'Estou lendo', value: 'reading' },
   { label: 'Quero ler', value: 'want_to_read' },
-  { label: 'Lidos', value: 'completed' },
+  { label: 'Já li', value: 'completed' },
 ];
 
 const SORT_LABELS: Record<SortOption, string> = {
@@ -75,6 +74,7 @@ export function LibraryView() {
   const deferredQuery = useDeferredValue(query);
   const activeStatusLabel =
     STATUS_FILTERS.find((filter) => filter.value === statusFilter)?.label ?? 'Todos';
+  const hasActiveFilters = Boolean(query.trim()) || statusFilter !== 'all';
 
   function updateParams(updates: Partial<Record<'q' | 'sort' | 'status', string>>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -163,19 +163,10 @@ export function LibraryView() {
   return (
     <PageContainer className="mx-auto w-full max-w-6xl gap-8">
       <section className="space-y-5">
-        <Badge variant="outline" className="rounded-md px-3 py-1">
-          Biblioteca
-        </Badge>
-
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <h1 className="font-editorial text-4xl leading-none font-semibold tracking-[-0.04em] sm:text-5xl">
-              Seus livros. Suas notas. Nada sobrando.
-            </h1>
-            <p className="text-muted-foreground text-sm leading-8 sm:text-base">
-              Abra app, encontre livro e continue pensando de onde parou.
-            </p>
-          </div>
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <h1 className="font-editorial text-4xl leading-none font-semibold tracking-[-0.04em] sm:text-5xl">
+            Seus livros. Suas notas. Nada sobrando.
+          </h1>
 
           {isConfigured ? <AddBookSheet /> : null}
         </div>
@@ -266,7 +257,7 @@ export function LibraryView() {
         </div>
       </section>
 
-      <section className="space-y-4">
+      <section className="flex flex-1 flex-col space-y-4">
         <div className="flex items-center justify-between gap-3">
           <p className="text-muted-foreground text-sm">
             {visibleBooks.length} {visibleBooks.length === 1 ? 'livro' : 'livros'}
@@ -280,8 +271,14 @@ export function LibraryView() {
         <BooksList
           books={visibleBooks}
           variant="compact"
-          emptyTitle="Nenhum livro encontrado"
-          emptyDescription="Tente outro termo ou ajuste filtros."
+          emptyTitle={
+            hasActiveFilters ? 'Nenhum livro encontrado' : 'Sua biblioteca ainda esta vazia'
+          }
+          emptyDescription={
+            hasActiveFilters
+              ? 'Tente ajustar a busca ou os filtros para encontrar outro livro.'
+              : 'Adicione o primeiro livro para transformar leitura em memória organizada.'
+          }
         />
       </section>
     </PageContainer>

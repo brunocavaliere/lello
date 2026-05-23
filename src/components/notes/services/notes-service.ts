@@ -9,6 +9,7 @@ import type {
 } from '@/components/notes/types';
 import { createSupabaseBrowserClient } from '@/lib/supabase/browser';
 import { isSupabaseConfigured } from '@/lib/supabase/config';
+import { requireAuthenticatedUser } from '@/lib/supabase/ensure-authenticated';
 import type { Database } from '@/lib/supabase/types';
 
 type NotesClient = SupabaseClient<Database>;
@@ -23,11 +24,11 @@ function ensureSupabaseConfigured() {
   }
 }
 
-function buildAudioStoragePath(bookId: string, audioFile: File) {
+function buildAudioStoragePath(userId: string, bookId: string, audioFile: File) {
   const extension =
     audioFile.name.split('.').pop()?.toLowerCase() || getAudioExtension(audioFile.type);
 
-  return `${bookId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+  return `${userId}/${bookId}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
 }
 
 function getAudioExtension(mimeType: string) {
@@ -51,6 +52,16 @@ function getAudioExtension(mimeType: string) {
 }
 
 function getAudioStoragePathFromUrl(audioUrl: string) {
+  if (
+    audioUrl &&
+    !audioUrl.startsWith('http://') &&
+    !audioUrl.startsWith('https://') &&
+    !audioUrl.startsWith('blob:') &&
+    !audioUrl.startsWith('data:')
+  ) {
+    return audioUrl;
+  }
+
   try {
     const { pathname } = new URL(audioUrl);
     const marker = `/${NOTES_AUDIO_BUCKET}/`;
@@ -72,10 +83,12 @@ export async function getNotesByBookId(bookId: string, client?: NotesClient) {
   }
 
   const supabase = getNotesClient(client);
+  const user = await requireAuthenticatedUser(supabase);
   const { data, error } = await supabase
     .from('notes')
     .select('*')
     .eq('book_id', bookId)
+    .eq('user_id', user.id)
     .order('created_at', { ascending: false });
 
   if (error) {
@@ -89,10 +102,12 @@ export async function createTextNote(input: TextNoteInput, client?: NotesClient)
   ensureSupabaseConfigured();
 
   const supabase = getNotesClient(client);
+  const user = await requireAuthenticatedUser(supabase);
   const { data, error } = await supabase
     .from('notes')
     .insert({
       book_id: input.bookId,
+      user_id: user.id,
       type: 'text',
       category: input.category,
       title: input.title,
@@ -113,7 +128,8 @@ export async function createAudioNote(input: AudioNoteInput, client?: NotesClien
   ensureSupabaseConfigured();
 
   const supabase = getNotesClient(client);
-  const audioPath = buildAudioStoragePath(input.bookId, input.audioFile);
+  const user = await requireAuthenticatedUser(supabase);
+  const audioPath = buildAudioStoragePath(user.id, input.bookId, input.audioFile);
   const { error: uploadError } = await supabase.storage
     .from(NOTES_AUDIO_BUCKET)
     .upload(audioPath, input.audioFile, {
@@ -126,19 +142,19 @@ export async function createAudioNote(input: AudioNoteInput, client?: NotesClien
     throw new Error(`Nao foi possivel enviar o audio: ${uploadError.message}`);
   }
 
-  const { data: publicUrlData } = supabase.storage.from(NOTES_AUDIO_BUCKET).getPublicUrl(audioPath);
   const normalizedTitle = input.title?.trim() || UNTITLED_NOTE_LABEL;
 
   const { data, error } = await supabase
     .from('notes')
     .insert({
       book_id: input.bookId,
+      user_id: user.id,
       type: 'audio',
       category: input.category,
       title: normalizedTitle,
       content_html: null,
       content_text: null,
-      audio_url: publicUrlData.publicUrl,
+      audio_url: audioPath,
       audio_duration_seconds: input.audioDurationSeconds,
     })
     .select('*')
@@ -156,6 +172,7 @@ export async function updateTextNote(input: UpdateTextNoteInput, client?: NotesC
   ensureSupabaseConfigured();
 
   const supabase = getNotesClient(client);
+  const user = await requireAuthenticatedUser(supabase);
   const { data, error } = await supabase
     .from('notes')
     .update({
@@ -166,6 +183,7 @@ export async function updateTextNote(input: UpdateTextNoteInput, client?: NotesC
       updated_at: new Date().toISOString(),
     })
     .eq('id', input.id)
+    .eq('user_id', user.id)
     .select('*')
     .single();
 
@@ -180,7 +198,8 @@ export async function deleteNote(note: Note, client?: NotesClient) {
   ensureSupabaseConfigured();
 
   const supabase = getNotesClient(client);
-  const { error } = await supabase.from('notes').delete().eq('id', note.id);
+  const user = await requireAuthenticatedUser(supabase);
+  const { error } = await supabase.from('notes').delete().eq('id', note.id).eq('user_id', user.id);
 
   if (error) {
     throw new Error(`Nao foi possivel excluir a nota: ${error.message}`);
@@ -193,4 +212,30 @@ export async function deleteNote(note: Note, client?: NotesClient) {
       await supabase.storage.from(NOTES_AUDIO_BUCKET).remove([audioPath]);
     }
   }
+}
+
+export async function getSignedAudioUrl(audioPath: string, client?: NotesClient) {
+  if (!isSupabaseConfigured()) {
+    return audioPath;
+  }
+
+  if (
+    audioPath.startsWith('http://') ||
+    audioPath.startsWith('https://') ||
+    audioPath.startsWith('blob:') ||
+    audioPath.startsWith('data:')
+  ) {
+    return audioPath;
+  }
+
+  const supabase = getNotesClient(client);
+  const { data, error } = await supabase.storage
+    .from(NOTES_AUDIO_BUCKET)
+    .createSignedUrl(audioPath, 60 * 60);
+
+  if (error) {
+    throw new Error(`Nao foi possivel preparar o audio: ${error.message}`);
+  }
+
+  return data.signedUrl;
 }

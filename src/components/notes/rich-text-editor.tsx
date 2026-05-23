@@ -2,7 +2,7 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { Bold, Heading2, Italic, List, ListOrdered, Quote, Redo2, Undo2 } from 'lucide-react';
+import { Bold, Italic, List, ListOrdered, Quote, Redo2, Underline, Undo2 } from 'lucide-react';
 
 import { NOTE_EDITOR_PLACEHOLDER } from '@/components/notes/constants';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,7 @@ type RichTextEditorProps = {
 const TOOLBAR_ITEMS = [
   { icon: Bold, label: 'Negrito', action: 'bold' },
   { icon: Italic, label: 'Italico', action: 'italic' },
-  { icon: Heading2, label: 'Titulo', action: 'heading' },
+  { icon: Underline, label: 'Sublinhado', action: 'underline' },
   { icon: List, label: 'Lista', action: 'bulletList' },
   { icon: ListOrdered, label: 'Lista numerada', action: 'orderedList' },
   { icon: Quote, label: 'Citacao', action: 'blockquote' },
@@ -92,8 +92,8 @@ export function RichTextEditor({
       case 'italic':
         chain.toggleItalic().run();
         break;
-      case 'heading':
-        chain.toggleHeading({ level: 2 }).run();
+      case 'underline':
+        chain.toggleUnderline().run();
         break;
       case 'bulletList':
         chain.toggleBulletList().run();
@@ -153,11 +153,10 @@ export function RichTextEditor({
           {TOOLBAR_GROUPS.map((group, groupIndex) => (
             <div key={`group-${groupIndex}`} className="flex items-center gap-1">
               {group.map((item) => {
-                const Icon = item.icon;
                 const isActive =
                   (item.action === 'bold' && editor.isActive('bold')) ||
                   (item.action === 'italic' && editor.isActive('italic')) ||
-                  (item.action === 'heading' && editor.isActive('heading', { level: 2 })) ||
+                  (item.action === 'underline' && editor.isActive('underline')) ||
                   (item.action === 'bulletList' && editor.isActive('bulletList')) ||
                   (item.action === 'orderedList' && editor.isActive('orderedList')) ||
                   (item.action === 'blockquote' && editor.isActive('blockquote'));
@@ -173,7 +172,7 @@ export function RichTextEditor({
                     title={item.label}
                     onClick={() => runAction(item.action)}
                   >
-                    <Icon className="size-4" />
+                    <item.icon className="size-4" />
                   </Button>
                 );
               })}
@@ -194,7 +193,7 @@ export function RichTextEditor({
         ) : null}
         <EditorContent
           editor={editor}
-          className="[&_blockquote]:border-border [&_blockquote]:text-muted-foreground [&_h2]:font-editorial [&_p.is-editor-empty:first-child]:text-muted-foreground [&_.ProseMirror]:relative [&_.ProseMirror]:z-0 [&_blockquote]:border-l-2 [&_blockquote]:pl-3 [&_h2]:text-2xl [&_h2]:leading-tight [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
+          className="[&_blockquote]:border-border [&_blockquote]:text-muted-foreground [&_p.is-editor-empty:first-child]:text-muted-foreground [&_.ProseMirror]:relative [&_.ProseMirror]:z-0 [&_blockquote]:border-l-2 [&_blockquote]:pl-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5"
         />
       </div>
     </div>

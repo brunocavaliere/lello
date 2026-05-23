@@ -8,10 +8,21 @@ import { ThemeProvider } from '@/providers/theme-provider';
 
 export function AppProviders({ children }: PropsWithChildren) {
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider attribute="class" defaultTheme="dark" disableTransitionOnChange>
       <QueryProvider>
         {children}
-        <Toaster richColors position="top-right" closeButton />
+        <Toaster
+          richColors
+          closeButton
+          position="bottom-center"
+          offset={16}
+          mobileOffset={16}
+          toastOptions={{
+            classNames: {
+              toast: 'md:ml-auto',
+            },
+          }}
+        />
       </QueryProvider>
     </ThemeProvider>
   );

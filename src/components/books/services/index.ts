@@ -10,3 +10,4 @@ export {
   getRecentReflectionEntries,
   updateBook,
 } from '@/components/books/services/books-service';
+export { searchExternalBooks } from '@/components/books/services/external-books-service';

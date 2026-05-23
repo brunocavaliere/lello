@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Search } from 'lucide-react';
 
@@ -22,10 +22,8 @@ export function AppHeader({
   className,
   searchPlaceholder = 'Buscar livros',
 }: AppHeaderProps) {
-  const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const shouldShowActions = !pathname.startsWith('/books/');
 
   return (
     <div className={cn('flex min-w-0 items-center gap-3', className)}>
@@ -60,8 +58,8 @@ export function AppHeader({
       </form>
 
       <div className="ml-auto flex items-center gap-2">
-        {shouldShowActions ? actions : null}
         <ThemeToggle />
+        {actions}
       </div>
     </div>
   );

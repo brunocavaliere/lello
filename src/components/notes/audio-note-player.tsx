@@ -4,8 +4,10 @@ import { useEffect, useRef, useState } from 'react';
 
 import { Pause, Play } from 'lucide-react';
 
+import { getSignedAudioUrl } from '@/components/notes/services';
 import { formatAudioDuration } from '@/components/notes/utils';
 import { Button } from '@/components/ui/button';
+import { showErrorToast } from '@/lib/toast';
 
 type AudioNotePlayerProps = {
   audioUrl: string;
@@ -17,6 +19,35 @@ export function AudioNotePlayer({ audioUrl, durationSeconds }: AudioNotePlayerPr
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [resolvedDuration, setResolvedDuration] = useState(durationSeconds ?? 0);
+  const [playbackUrl, setPlaybackUrl] = useState(audioUrl);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function resolveAudioUrl() {
+      try {
+        const signedUrl = await getSignedAudioUrl(audioUrl);
+
+        if (isMounted) {
+          setPlaybackUrl(signedUrl);
+        }
+      } catch (error) {
+        if (isMounted) {
+          setPlaybackUrl(audioUrl);
+          showErrorToast('Não foi possível preparar o áudio.', {
+            description:
+              error instanceof Error ? error.message : 'Tente novamente em alguns instantes.',
+          });
+        }
+      }
+    }
+
+    void resolveAudioUrl();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [audioUrl]);
 
   useEffect(() => {
     const audioElement = audioRef.current;
@@ -82,7 +113,7 @@ export function AudioNotePlayer({ audioUrl, durationSeconds }: AudioNotePlayerPr
 
   return (
     <div className="border-border/70 bg-card/50 flex items-center gap-4 rounded-lg border px-4 py-4">
-      <audio ref={audioRef} src={audioUrl} preload="metadata" />
+      <audio ref={audioRef} src={playbackUrl} preload="metadata" />
 
       <Button
         type="button"

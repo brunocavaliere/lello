@@ -1,14 +1,35 @@
 import type {
   Book as PersistedBook,
-  BookInsert as PersistedBookInsert,
   BookStatus as PersistedBookStatus,
-  BookUpdate as PersistedBookUpdate,
 } from '@/lib/supabase/types';
 
 export type Book = PersistedBook;
-export type BookInsert = PersistedBookInsert;
 export type BookStatus = PersistedBookStatus;
-export type BookUpdate = PersistedBookUpdate;
+export type BookInsert = {
+  title: string;
+  author: string;
+  status: BookStatus;
+  description?: string | null;
+  cover_url?: string | null;
+  publisher?: string | null;
+  published_at?: string | null;
+};
+
+export type BookUpdate = Partial<BookInsert> & {
+  rating?: number | null;
+};
+
+export type ExternalBook = {
+  external_id: string;
+  title: string;
+  author: string;
+  description?: string | null;
+  cover_url?: string | null;
+  publisher?: string | null;
+  published_at?: string | null;
+  page_count?: number | null;
+  categories?: string[];
+};
 
 export type BookStatusMeta = {
   label: string;

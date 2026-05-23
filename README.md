@@ -24,7 +24,7 @@ The current base includes:
 - module generator
 - Git hooks with Husky + lint-staged
 - simple CI with GitHub Actions
-- optional Supabase base without auth
+- Supabase com Auth, RLS e ownership por usuário
 
 ## Stack
 
@@ -202,12 +202,20 @@ NEXT_PUBLIC_APP_NAME=
 NEXT_PUBLIC_APP_URL=
 ```
 
-Optional Supabase environment variables:
+Supabase environment variables:
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_ANON_KEY=
 ```
+
+Optional Google Books API key:
+
+```bash
+GOOGLE_BOOKS_API_KEY=
+```
+
+The book search feature works without the key for public requests, but using a key gives you quota control and a more stable production setup.
 
 If the project does not use Supabase, leave both empty.
 
@@ -253,11 +261,34 @@ import { createSupabaseBrowserClient, createSupabaseServerClient } from '@/lib/s
 
 Current scope:
 
-- includes only base clients
-- does not include auth
-- does not include middleware
-- does not include protected routes
-- does not include policies, migrations, or CLI
+- browser and server clients
+- email/password auth
+- workspace routes protegidas
+- RLS para `books` e `notes`
+- ownership por `user_id`
+- bucket privado `notes-audio` com acesso autenticado
+
+## Supabase Auth e Ownership
+
+Para o fluxo atual do Lello:
+
+- habilite Email/Password em Supabase Auth
+- aplique as migrations de `supabase/migrations/`
+- mantenha RLS ativa em `books` e `notes`
+- use um bucket privado `notes-audio`
+
+Checklist manual:
+
+- criar conta
+- entrar
+- criar livro
+- criar nota escrita
+- criar nota de áudio
+- sair
+- entrar novamente
+- confirmar que os dados persistem
+- criar uma segunda conta
+- confirmar que os dados da primeira não aparecem
 
 ## Git Hooks and CI
 

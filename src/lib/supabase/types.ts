@@ -4,9 +4,14 @@ export type NoteCategory = 'note' | 'reflection' | 'quote' | 'summary';
 
 export type Book = {
   id: string;
+  user_id: string;
   title: string;
   author: string;
   status: BookStatus;
+  description?: string | null;
+  cover_url?: string | null;
+  publisher?: string | null;
+  published_at?: string | null;
   rating?: number | null;
   created_at: string;
   updated_at: string;
@@ -16,6 +21,10 @@ export type BookInsert = {
   title: string;
   author: string;
   status: BookStatus;
+  description?: string | null;
+  cover_url?: string | null;
+  publisher?: string | null;
+  published_at?: string | null;
 };
 
 export type BookUpdate = Partial<BookInsert> & {
@@ -25,6 +34,7 @@ export type BookUpdate = Partial<BookInsert> & {
 export type Note = {
   id: string;
   book_id: string;
+  user_id: string;
   type: NoteType;
   category: NoteCategory;
   title: string | null;
@@ -67,17 +77,27 @@ export type Database = {
         Row: Book;
         Insert: {
           id?: string;
+          user_id: string;
           title: string;
           author: string;
           status: BookStatus;
+          description?: string | null;
+          cover_url?: string | null;
+          publisher?: string | null;
+          published_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           id?: string;
+          user_id?: string;
           title?: string;
           author?: string;
           status?: BookStatus;
+          description?: string | null;
+          cover_url?: string | null;
+          publisher?: string | null;
+          published_at?: string | null;
           rating?: number | null;
           created_at?: string;
           updated_at?: string;
@@ -89,6 +109,7 @@ export type Database = {
         Insert: {
           id?: string;
           book_id: string;
+          user_id: string;
           type?: NoteType;
           category?: NoteCategory;
           title?: string | null;
@@ -102,6 +123,7 @@ export type Database = {
         Update: {
           id?: string;
           book_id?: string;
+          user_id?: string;
           type?: NoteType;
           category?: NoteCategory;
           title?: string | null;
