@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-import { Mic, Square } from 'lucide-react';
+import { Mic, Pause, Play, Square } from 'lucide-react';
 
 import { AudioNotePlayer } from '@/components/notes/audio-note-player';
 import { NOTE_CATEGORY_OPTIONS, UNTITLED_NOTE_LABEL } from '@/components/notes/constants';
@@ -33,7 +33,7 @@ type AudioNoteRecorderDrawerProps = {
   onOpenChange: (open: boolean) => void;
 };
 
-type RecorderStep = 'idle' | 'recording' | 'preview';
+type RecorderStep = 'idle' | 'recording' | 'paused' | 'preview';
 
 const SUPPORTED_AUDIO_MIME_TYPES = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'] as const;
 
@@ -79,6 +79,13 @@ export function AudioNoteRecorderDrawer({
       window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
+  }
+
+  function startTimer() {
+    clearTimer();
+    timerRef.current = window.setInterval(() => {
+      setRecordingSeconds((current) => current + 1);
+    }, 1000);
   }
 
   function stopStream() {
@@ -191,11 +198,19 @@ export function AudioNoteRecorderDrawer({
         setStep('preview');
       });
 
+      mediaRecorder.addEventListener('pause', () => {
+        clearTimer();
+        setStep('paused');
+      });
+
+      mediaRecorder.addEventListener('resume', () => {
+        setStep('recording');
+        startTimer();
+      });
+
       mediaRecorder.start();
       setStep('recording');
-      timerRef.current = window.setInterval(() => {
-        setRecordingSeconds((current) => current + 1);
-      }, 1000);
+      startTimer();
     } catch (error) {
       showErrorToast('Não foi possível iniciar a gravação.', {
         description: error instanceof Error ? error.message : 'Verifique a permissão de microfone.',
@@ -211,6 +226,26 @@ export function AudioNoteRecorderDrawer({
     }
 
     mediaRecorder.stop();
+  }
+
+  function handlePauseRecording() {
+    const mediaRecorder = mediaRecorderRef.current;
+
+    if (!mediaRecorder || mediaRecorder.state !== 'recording') {
+      return;
+    }
+
+    mediaRecorder.pause();
+  }
+
+  function handleResumeRecording() {
+    const mediaRecorder = mediaRecorderRef.current;
+
+    if (!mediaRecorder || mediaRecorder.state !== 'paused') {
+      return;
+    }
+
+    mediaRecorder.resume();
   }
 
   function handleCancelRecording() {
@@ -251,7 +286,7 @@ export function AudioNoteRecorderDrawer({
 
   return (
     <Drawer open={open} onOpenChange={handleDrawerOpenChange}>
-      <DrawerContent className="h-[76dvh] max-h-[76dvh] px-0 pb-0">
+      <DrawerContent className="h-[76dvh] max-h-[76dvh] px-0 pb-0 md:h-[100dvh] md:max-h-[100dvh]">
         <DrawerHeader className="gap-3 px-5 pt-6 pb-2 sm:px-6 sm:pt-7">
           <DrawerTitle className="font-editorial text-2xl tracking-[-0.03em]">
             Nova nota de áudio
@@ -280,21 +315,45 @@ export function AudioNoteRecorderDrawer({
             </div>
           ) : null}
 
-          {step === 'recording' ? (
+          {step === 'recording' || step === 'paused' ? (
             <div className="flex flex-1 flex-col justify-center gap-8 pb-6 text-center">
               <div className="space-y-3">
-                <p className="text-destructive text-sm font-medium">Gravando...</p>
+                <p className="text-destructive text-sm font-medium">
+                  {step === 'paused' ? 'Gravação pausada' : 'Gravando...'}
+                </p>
                 <p className="font-editorial text-5xl tracking-[-0.05em]">
                   {formatAudioDuration(recordingSeconds)}
                 </p>
               </div>
 
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center gap-3">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full"
+                  aria-label={step === 'paused' ? 'Retomar gravação' : 'Pausar gravação'}
+                  onClick={() =>
+                    step === 'paused' ? handleResumeRecording() : handlePauseRecording()
+                  }
+                >
+                  {step === 'paused' ? (
+                    <>
+                      <Play className="mr-2 size-4 fill-current" />
+                      Retomar
+                    </>
+                  ) : (
+                    <>
+                      <Pause className="mr-2 size-4 fill-current" />
+                      Pausar
+                    </>
+                  )}
+                </Button>
+
                 <Button
                   type="button"
                   size="icon"
                   className="size-20 rounded-full shadow-lg"
-                  aria-label="Finalizar gravação"
+                  aria-label="Encerrar gravação"
                   onClick={() => handleStopRecording()}
                 >
                   <Square className="size-6 fill-current" />

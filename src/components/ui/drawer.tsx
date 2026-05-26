@@ -101,7 +101,7 @@ function DrawerOverlay({
       <DialogPrimitive.Overlay
         data-slot="drawer-overlay"
         className={cn(
-          'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px]',
+          'fixed inset-0 z-50 bg-black/45 backdrop-blur-[2px] transition-opacity data-[state=closed]:opacity-0 data-[state=closed]:duration-300 data-[state=open]:opacity-100 data-[state=open]:duration-500',
           className
         )}
         {...props}
@@ -132,7 +132,7 @@ function DrawerContent({
         <DialogPrimitive.Content
           data-slot="drawer-content"
           className={cn(
-            'bg-background border-border/80 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right fixed right-0 bottom-0 left-auto z-50 mt-0 flex h-full w-full flex-col border-l shadow-2xl transition ease-in-out outline-none data-[state=closed]:duration-300 data-[state=open]:duration-500 md:max-w-xl',
+            'bg-background border-border/80 fixed top-0 right-0 bottom-0 left-auto z-50 mt-0 flex h-full w-full flex-col border-l shadow-2xl transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] outline-none data-[state=closed]:translate-x-full data-[state=closed]:duration-300 data-[state=open]:translate-x-0 data-[state=open]:duration-500 md:max-w-xl',
             className,
             'md:top-0 md:max-h-none md:rounded-none md:rounded-l-[1rem] md:border-t-0'
           )}
