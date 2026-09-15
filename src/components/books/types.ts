@@ -13,6 +13,10 @@ export type BookInsert = {
   cover_url?: string | null;
   publisher?: string | null;
   published_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  review?: string | null;
+  rating?: number | null;
 };
 
 export type BookUpdate = Partial<BookInsert> & {

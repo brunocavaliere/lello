@@ -31,7 +31,7 @@ export function BookCover({ alt, coverUrl, className, imageClassName }: BookCove
         src={coverUrl}
         alt={alt}
         fill
-        sizes="(max-width: 768px) 64px, 96px"
+        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
         className={cn('object-cover', imageClassName)}
       />
     </div>

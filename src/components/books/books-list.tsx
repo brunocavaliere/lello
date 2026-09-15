@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 type BooksListProps = {
   books: Book[];
   layout?: 'grid' | 'stack';
-  variant?: 'default' | 'compact' | 'featured';
+  variant?: 'default' | 'compact' | 'grid' | 'featured';
   showReflection?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
@@ -39,7 +39,7 @@ export function BooksList({
     <div
       className={cn(
         'grid gap-3',
-        layout === 'grid' && 'lg:grid-cols-2',
+        layout === 'grid' && 'sm:grid-cols-2 lg:grid-cols-3',
         layout === 'stack' && 'grid-cols-1',
         className
       )}

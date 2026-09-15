@@ -14,6 +14,7 @@ import { ExternalBookResultItem } from '@/components/books/external-book-result-
 import { useCreateBook, useExternalBookSearch, useUpdateBook } from '@/components/books/hooks';
 import { createBookSchema } from '@/components/books/schemas';
 import type { Book, ExternalBook } from '@/components/books/types';
+import { formatDateInputValue } from '@/components/books/utils';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -31,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import {
   Sheet,
   SheetContent,
@@ -81,6 +83,10 @@ export function AddBookSheet({
       cover_url: book?.cover_url ?? null,
       publisher: book?.publisher ?? null,
       published_at: book?.published_at ?? null,
+      started_at: formatDateInputValue(book?.started_at),
+      completed_at: formatDateInputValue(book?.completed_at),
+      rating: book?.rating ?? null,
+      review: book?.review ?? null,
     },
   });
   const watchedCoverUrl = useWatch({
@@ -129,6 +135,10 @@ export function AddBookSheet({
       cover_url: book?.cover_url ?? null,
       publisher: book?.publisher ?? null,
       published_at: book?.published_at ?? null,
+      started_at: formatDateInputValue(book?.started_at),
+      completed_at: formatDateInputValue(book?.completed_at),
+      rating: book?.rating ?? null,
+      review: book?.review ?? null,
     });
   }
 
@@ -147,6 +157,14 @@ export function AddBookSheet({
           description: values.description ?? null,
           published_at: values.published_at ?? null,
           publisher: values.publisher ?? null,
+          started_at: values.started_at
+            ? new Date(`${values.started_at}T12:00:00Z`).toISOString()
+            : null,
+          completed_at: values.completed_at
+            ? new Date(`${values.completed_at}T12:00:00Z`).toISOString()
+            : null,
+          rating: values.rating ?? null,
+          review: values.review ?? null,
           status: values.status,
           title: values.title,
         });
@@ -157,6 +175,14 @@ export function AddBookSheet({
           description: values.description ?? null,
           published_at: values.published_at ?? null,
           publisher: values.publisher ?? null,
+          started_at: values.started_at
+            ? new Date(`${values.started_at}T12:00:00Z`).toISOString()
+            : null,
+          completed_at: values.completed_at
+            ? new Date(`${values.completed_at}T12:00:00Z`).toISOString()
+            : null,
+          rating: values.rating ?? null,
+          review: values.review ?? null,
           status: values.status,
           title: values.title,
         });
@@ -192,6 +218,10 @@ export function AddBookSheet({
       cover_url: book.cover_url ?? null,
       publisher: book.publisher ?? null,
       published_at: book.published_at ?? null,
+      started_at: form.getValues('started_at') ?? null,
+      completed_at: form.getValues('completed_at') ?? null,
+      rating: form.getValues('rating') ?? null,
+      review: form.getValues('review') ?? null,
     });
     setIsSearchOpen(false);
   }
@@ -365,6 +395,86 @@ export function AddBookSheet({
                         ))}
                       </SelectContent>
                     </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField
+                  control={form.control}
+                  name="started_at"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Começou em</FormLabel>
+                      <FormControl>
+                        <Input type="date" value={field.value ?? ''} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="completed_at"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Concluiu em</FormLabel>
+                      <FormControl>
+                        <Input type="date" value={field.value ?? ''} onChange={field.onChange} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="rating"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Avaliação</FormLabel>
+                    <Select
+                      value={field.value ? String(field.value) : 'none'}
+                      onValueChange={(value) =>
+                        field.onChange(value === 'none' ? null : Number(value))
+                      }
+                    >
+                      <FormControl>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Ainda sem avaliação" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="none">Ainda sem avaliação</SelectItem>
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                          <SelectItem key={rating} value={String(rating)}>
+                            {rating} {rating === 1 ? 'estrela' : 'estrelas'}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="review"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Comentário pessoal</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        value={field.value ?? ''}
+                        placeholder="O que você achou deste livro?"
+                        className="min-h-28 resize-y"
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

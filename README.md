@@ -1,13 +1,15 @@
-# next-saas-starter
+# Lello
 
-Modern boilerplate for new SaaS products built with Next.js App Router, TypeScript,
-`shadcn/ui`, testing, automated quality checks, and a domain-driven frontend structure.
+Personal library for organizing what you want to read, are reading, and have read.
+
+The project is built with Next.js App Router, TypeScript, `shadcn/ui`, testing,
+automated quality checks, and a domain-driven frontend structure.
 
 ## Overview
 
-This repository is prepared to be used as a GitHub Template Repository. The goal is to
-reduce the time between "create the repo" and "start building the product" without adding
-premature complexity.
+Lello helps readers maintain a simple, useful history of their reading. Books are the
+main product surface; comments, written notes, and audio notes are optional details
+attached to each book.
 
 The current base includes:
 

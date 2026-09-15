@@ -12,6 +12,9 @@ export type Book = {
   cover_url?: string | null;
   publisher?: string | null;
   published_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  review?: string | null;
   rating?: number | null;
   created_at: string;
   updated_at: string;
@@ -25,6 +28,10 @@ export type BookInsert = {
   cover_url?: string | null;
   publisher?: string | null;
   published_at?: string | null;
+  started_at?: string | null;
+  completed_at?: string | null;
+  review?: string | null;
+  rating?: number | null;
 };
 
 export type BookUpdate = Partial<BookInsert> & {
@@ -85,6 +92,10 @@ export type Database = {
           cover_url?: string | null;
           publisher?: string | null;
           published_at?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          review?: string | null;
+          rating?: number | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -98,6 +109,9 @@ export type Database = {
           cover_url?: string | null;
           publisher?: string | null;
           published_at?: string | null;
+          started_at?: string | null;
+          completed_at?: string | null;
+          review?: string | null;
           rating?: number | null;
           created_at?: string;
           updated_at?: string;

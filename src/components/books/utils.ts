@@ -4,6 +4,7 @@ import type {
   BookContext,
   BookNote,
   BookNoteType,
+  BookUpdate,
   BookStatus,
 } from '@/components/books/types';
 
@@ -33,6 +34,36 @@ export function formatBookDateCompact(date: string) {
     month: '2-digit',
     year: '2-digit',
   }).format(new Date(date));
+}
+
+export function formatDateInputValue(date?: string | null) {
+  return date ? date.slice(0, 10) : null;
+}
+
+export function getBookStatusTransition(book: Book, status: BookStatus, now = new Date()) {
+  const timestamp = now.toISOString();
+
+  if (status === 'want_to_read') {
+    return {
+      status,
+      started_at: null,
+      completed_at: null,
+    } satisfies BookUpdate;
+  }
+
+  if (status === 'reading') {
+    return {
+      status,
+      started_at: book.status === 'reading' ? (book.started_at ?? timestamp) : timestamp,
+      completed_at: null,
+    } satisfies BookUpdate;
+  }
+
+  return {
+    status,
+    started_at: book.started_at ?? timestamp,
+    completed_at: timestamp,
+  } satisfies BookUpdate;
 }
 
 export function getBookNoteTypeLabel(type: BookNoteType) {

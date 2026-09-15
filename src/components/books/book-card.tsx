@@ -4,19 +4,62 @@ import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 
 import type { Book } from '@/components/books/types';
-import { formatBookDate, formatBookDateCompact, getBookStatusMeta } from '@/components/books/utils';
+import {
+  formatBookDate,
+  formatBookDateCompact,
+  formatBookRating,
+  getBookStatusMeta,
+} from '@/components/books/utils';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 type BookCardProps = {
   book: Book;
-  variant?: 'default' | 'compact' | 'featured';
+  variant?: 'default' | 'compact' | 'grid' | 'featured';
   showReflection?: boolean;
 };
 
 export function BookCard({ book, variant = 'default' }: BookCardProps) {
   const statusMeta = getBookStatusMeta(book.status);
   const isCompact = variant === 'compact';
+  const isGrid = variant === 'grid';
+
+  if (isGrid) {
+    return (
+      <Link
+        href={`/books/${book.id}`}
+        className="bg-card/75 hover:bg-card border-border/70 flex h-full min-h-48 gap-3 rounded-xl border p-3 shadow-none transition-colors sm:gap-4 sm:p-4"
+      >
+        <div className="relative min-h-40 w-24 shrink-0 self-stretch sm:w-28">
+          <BookCover
+            alt={`Capa de ${book.title}`}
+            coverUrl={book.cover_url}
+            className="h-full w-full rounded-lg"
+            imageClassName="object-cover"
+          />
+        </div>
+
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 py-1">
+          <div className="flex items-center justify-between gap-2">
+            <Badge variant={statusMeta.badgeVariant} className="rounded-full">
+              {statusMeta.label}
+            </Badge>
+            <ArrowUpRight className="text-muted-foreground size-4 shrink-0" />
+          </div>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="font-editorial line-clamp-3 text-lg leading-tight font-semibold tracking-[-0.03em] sm:text-xl">
+              {book.title}
+            </h3>
+          </div>
+          <p className="text-muted-foreground text-sm">{book.author}</p>
+          <div className="text-muted-foreground mt-auto flex flex-wrap gap-x-2 pt-2 text-xs">
+            {book.completed_at ? <span>{formatBookDate(book.completed_at)}</span> : null}
+            {book.rating ? <span>{formatBookRating(book.rating)}</span> : null}
+          </div>
+        </div>
+      </Link>
+    );
+  }
 
   return (
     <Link
@@ -56,6 +99,12 @@ export function BookCard({ book, variant = 'default' }: BookCardProps) {
               {book.title}
             </h3>
             <p className="text-muted-foreground text-sm">{book.author}</p>
+            <div className="text-muted-foreground flex flex-wrap gap-x-2 text-xs">
+              {book.completed_at ? (
+                <span>Concluído em {formatBookDate(book.completed_at)}</span>
+              ) : null}
+              {book.rating ? <span>{formatBookRating(book.rating)}</span> : null}
+            </div>
           </div>
         </div>
 

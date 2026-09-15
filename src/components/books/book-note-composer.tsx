@@ -70,12 +70,19 @@ export function BookNoteComposer({ onSelectAudioNote, onSelectTextNote }: BookNo
   const trigger = (
     <Button
       type="button"
-      size="icon"
-      className="fixed right-4 bottom-5 z-40 size-14 rounded-full shadow-lg sm:right-6 sm:bottom-6"
+      variant="outline"
+      className="border-border/70 bg-card/60 h-auto w-full justify-start rounded-xl px-4 py-3 text-left shadow-none"
       aria-label="Nova nota"
     >
-      <Plus className="size-5" />
-      <span className="sr-only">Nova nota</span>
+      <div className="bg-muted text-foreground flex size-9 shrink-0 items-center justify-center rounded-full">
+        <Plus className="size-4" />
+      </div>
+      <div className="min-w-0">
+        <span className="block text-sm font-medium">Adicionar uma nota</span>
+        <span className="text-muted-foreground block text-xs font-normal">
+          Opcional: escreva ou grave algo sobre este livro.
+        </span>
+      </div>
     </Button>
   );
 
